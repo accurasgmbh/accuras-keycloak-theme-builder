@@ -1,39 +1,51 @@
-import { Suspense, lazy } from "react";
-import type { ClassKey } from "keycloakify/login";
-import type { KcContext } from "./KcContext";
-import { useI18n } from "./i18n";
+import {Suspense, lazy} from "react";
+import type {ClassKey} from "keycloakify/login";
+import {useI18n} from "./i18n";
 import DefaultPage from "keycloakify/login/DefaultPage";
 import Template from "keycloakify/login/Template";
+import {Login} from "./custom/Login.tsx";
+import {MantineProvider} from "@mantine/core";
+import {KcContext} from "keycloakify/login/KcContext";
+import {AppTheme} from "../MantineTheme.ts";
+
 const UserProfileFormFields = lazy(
     () => import("keycloakify/login/UserProfileFormFields")
 );
 
+// core styles are required for all packages
+import '@mantine/core/styles.css';
+
 const doMakeUserConfirmPassword = true;
 
 export default function KcPage(props: { kcContext: KcContext }) {
-    const { kcContext } = props;
+    const {kcContext} = props;
 
-    const { i18n } = useI18n({ kcContext });
+    const {i18n} = useI18n({kcContext});
 
     return (
-        <Suspense>
-            {(() => {
-                switch (kcContext.pageId) {
-                    default:
-                        return (
-                            <DefaultPage
-                                kcContext={kcContext}
-                                i18n={i18n}
-                                classes={classes}
-                                Template={Template}
-                                doUseDefaultCss={true}
-                                UserProfileFormFields={UserProfileFormFields}
-                                doMakeUserConfirmPassword={doMakeUserConfirmPassword}
-                            />
-                        );
-                }
-            })()}
-        </Suspense>
+        <MantineProvider theme={AppTheme}>
+            <Suspense>
+                {(() => {
+                    switch (kcContext.pageId) {
+                        case "login.ftl":
+                            return <Login context={kcContext}/>
+                        default:
+                            return (
+                                <DefaultPage
+                                    kcContext={kcContext}
+                                    i18n={i18n}
+                                    classes={classes}
+                                    Template={Template}
+                                    doUseDefaultCss={true}
+                                    UserProfileFormFields={UserProfileFormFields}
+                                    doMakeUserConfirmPassword={doMakeUserConfirmPassword}
+                                />
+                            );
+                    }
+                })()}
+            </Suspense>
+
+        </MantineProvider>
     );
 }
 
