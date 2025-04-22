@@ -14,6 +14,8 @@ const UserProfileFormFields = lazy(
 
 // core styles are required for all packages
 import '@mantine/core/styles.css';
+import {OrganizationContextProvider} from "../api/OrganizationContextProvider.tsx";
+import {MapBackground} from "./custom/MapBackground.tsx";
 
 const doMakeUserConfirmPassword = true;
 
@@ -22,31 +24,35 @@ export default function KcPage(props: { kcContext: KcContext }) {
 
     const {i18n} = useI18n({kcContext});
 
-    return (
+    return <>
+        <MapBackground/>
         <MantineProvider theme={AppTheme}>
-            <Suspense>
-                {(() => {
-                    switch (kcContext.pageId) {
-                        case "login.ftl":
-                            return <Login context={kcContext}/>
-                        default:
-                            return (
-                                <DefaultPage
-                                    kcContext={kcContext}
-                                    i18n={i18n}
-                                    classes={classes}
-                                    Template={Template}
-                                    doUseDefaultCss={true}
-                                    UserProfileFormFields={UserProfileFormFields}
-                                    doMakeUserConfirmPassword={doMakeUserConfirmPassword}
-                                />
-                            );
-                    }
-                })()}
-            </Suspense>
+            <OrganizationContextProvider kcContext={kcContext as KcContext.Login}>
+
+                <Suspense>
+                    {(() => {
+                        switch (kcContext.pageId) {
+                            case "login.ftl":
+                                return <Login/>
+                            default:
+                                return (
+                                    <DefaultPage
+                                        kcContext={kcContext}
+                                        i18n={i18n}
+                                        classes={classes}
+                                        Template={Template}
+                                        doUseDefaultCss={true}
+                                        UserProfileFormFields={UserProfileFormFields}
+                                        doMakeUserConfirmPassword={doMakeUserConfirmPassword}
+                                    />
+                                );
+                        }
+                    })()}
+                </Suspense>
+            </OrganizationContextProvider>
 
         </MantineProvider>
-    );
+    </>
 }
 
 const classes = {} satisfies { [key in ClassKey]?: string };

@@ -1,23 +1,183 @@
-import {Anchor, Button, Checkbox, Flex, LoadingOverlay, Paper, Text, TextInput} from "@mantine/core"
-import {useI18n} from "../i18n.ts";
+import {em, Flex, LoadingOverlay, Paper} from "@mantine/core"
 import {LanguageSelector} from "./LanguageSelector.tsx";
 import {useState} from "react";
-import {useForm} from "@mantine/form";
+import {useForm, UseFormReturnType} from "@mantine/form";
 import {AppTheme} from "../../MantineTheme.ts";
 import {KcContext} from "keycloakify/login/KcContext";
 
-const LOGO_URL = "https://cdn.prod.website-files.com/64070f604bcb37e0f7c95578/640a377dece1be7881e21133_accuras-Logo_2023-p-500.png"
+import 'mapbox-gl/dist/mapbox-gl.css';
+import {Registration} from "./Registration.tsx";
+import {Message} from "./Message.tsx";
+import {RememberMe} from "./RememberMe.tsx";
+import {ForgotPassword} from "./ForgotPassword.tsx";
+import {SignInButton} from "./SignInButton.tsx";
+import {PasswordInput} from "./PasswordInput.tsx";
+import {UsernameInput} from "./UsernameInput.tsx";
+import {Logo} from "./Logo.tsx";
+import {useMediaQuery} from "@mantine/hooks";
+import {Organization} from "../../api/organizations.ts";
+import {useOrganizationContext} from "../../api/OrganizationContextProvider.tsx";
 
-export const Login = (props: { context: KcContext.Login }) => {
+export interface OrganizationLoginContext extends KcContext.Login {
+    organization: Organization | null
+}
 
-    const {i18n} = useI18n({kcContext: props.context});
+export const MobileLogin = (props: {
+    loading: boolean,
+    setLoading: (value: boolean) => void,
+    context: OrganizationLoginContext,
+    form: UseFormReturnType<any>
+}) => {
 
+
+    return <Flex direction={"column"}
+                 p={"sm"}
+                 style={{
+                     backgroundColor: "white",
+                     borderBottom: "1x solid rgba(0,0,0,0.1)"
+                 }}
+                 pb={2 * Number.parseFloat(AppTheme.spacing!.xl!)}
+                 align={"stretch"}>
+
+
+        <Flex justify={"end"} mb={"xl"}>
+            <LanguageSelector kcContext={props.context}/>
+        </Flex>
+
+        <Flex justify={"center"}>
+            <Logo/>
+        </Flex>
+        <Flex p={"lg"} justify={"center"} direction={"column"}>
+            <form
+                method={"post"}
+                action={props.context.url.loginAction}
+                onSubmit={props.form.onSubmit(() => {
+                    props.setLoading(true);
+                })}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: AppTheme.spacing!.sm,
+                }}>
+
+                <UsernameInput context={props.context} form={props.form}/>
+
+                <PasswordInput context={props.context} form={props.form}/>
+
+                <Flex justify={"space-between"}>
+                    <RememberMe form={props.form} context={props.context}/>
+                    <ForgotPassword context={props.context}/>
+                </Flex>
+
+                <Message context={props.context}/>
+
+                <SignInButton context={props.context}/>
+
+            </form>
+
+        </Flex>
+
+        <Registration context={props.context}/>
+
+
+    </Flex>
+
+}
+
+export const DesktopLogin = (props: {
+    loading: boolean,
+    setLoading: (value: boolean) => void,
+    context: OrganizationLoginContext,
+    form: UseFormReturnType<any>
+}) => {
+
+    return <>
+        <div
+            style={{
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+                height: "100vh",
+                width: "100vw",
+                backdropFilter: "blur(5px)"
+            }}>
+
+
+            <div style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                zIndex: 2,
+            }}>
+                <LanguageSelector kcContext={props.context}/>
+            </div>
+
+            <Paper
+                pos={"relative"}
+                radius={"sm"}
+                w={360}
+                p={"xl"}
+                style={{
+                    zIndex: 2,
+                }}
+                shadow={"xl"}>
+                <LoadingOverlay
+                    loaderProps={{
+                        type: "dots"
+                    }}
+                    visible={props.loading} zIndex={1000} overlayProps={{radius: "sm", blur: 2}}/>
+
+
+                <Flex justify={"center"} mb={"xl"}>
+                    <Logo/>
+                </Flex>
+                <form
+                    method={"post"}
+                    action={props.context.url.loginAction}
+                    onSubmit={props.form.onSubmit(() => {
+                        props.setLoading(true);
+                    })}
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: AppTheme.spacing!.sm,
+                    }}>
+
+                    <UsernameInput context={props.context} form={props.form}/>
+
+                    <PasswordInput context={props.context} form={props.form}/>
+
+                    <Flex justify={"space-between"}>
+                        <RememberMe form={props.form} context={props.context}/>
+                        <ForgotPassword context={props.context}/>
+                    </Flex>
+
+                    <Message context={props.context}/>
+
+                    <SignInButton context={props.context}/>
+
+                </form>
+
+                <Registration context={props.context}/>
+
+            </Paper>
+
+        </div>
+
+    </>
+
+}
+
+export const Login = () => {
+
+    const context = useOrganizationContext();
     const [loading, setLoading] = useState(false);
-
+    const isMobile = useMediaQuery(`(max-width: ${em(400)})`);
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
-            email: '',
+            username: context.login.username ?? "",
+            email: context.login.username ?? "",
             password: '',
             rememberMe: false,
         },
@@ -33,104 +193,15 @@ export const Login = (props: { context: KcContext.Login }) => {
         },
     });
 
-    return <Flex
-        align={"center"}
-        justify={"center"}
-        style={{
-            backgroundColor: "#f1f1f1",
-            height: "100vh",
-            width: "100vw"
-        }}>
 
-         <Paper
-             pos={"relative"}
-            radius={"sm"}
-            w={360}
-            p={"xl"}
-            shadow={"xl"}>
-             <LoadingOverlay
-                 loaderProps={{
-                     type: "dots"
-                 }}
-                 visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
-
-            <div style={{
-                position: "absolute",
-                top: 12,
-                right: 12
-            }}>
-                <LanguageSelector kcContext={props.context}/>
-            </div>
-
-            <Flex justify={"center"} mb={"xl"}>
-                <img style={{maxWidth: 180}}
-                     src={LOGO_URL}
-                     alt="Logo"/>
-            </Flex>
-            <form
-                method={"post"}
-                action={props.context.url.loginAction}
-                onSubmit={form.onSubmit(() => {
-                    setLoading(true);
-                })}
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: AppTheme.spacing!.sm,
-                }}>
-                <TextInput
-                    id={"username"}
-                    name={"username"}
-                    {...form.getInputProps('email')}
-                    type={"email"}
-                    label={i18n.msg("email")}
-                    placeholder={i18n.msgStr("email")}/>
-
-                <TextInput
-                    id={"password"}
-                    name={"password"}
-                    {...form.getInputProps('password')}
-                    type={"password"}
-                    label={i18n.msg("password")}
-                    placeholder={i18n.msgStr("password")}/>
-
-                <Flex mb={"md"} justify={"space-between"} mt={"sm"}>
-                    <Checkbox
-                        id={"rememberMe"}
-                        name={"rememberMe"}
-                        defaultChecked={false}
-                        {...form.getInputProps('rememberMe')}
-                        label={i18n.msg("rememberMe")}/>
-                    <Anchor href={props.context.url.loginResetCredentialsUrl}>
-                        {i18n.msg("doForgotPassword")}
-                    </Anchor>
-                </Flex>
-
-
-                {(props.context.messagesPerField.existsError("username")
-                        || props.context.messagesPerField.existsError("password")) &&
-                    <Flex justify={"center"}>
-                        <Text c={"red"}>
-                            {props.context.messagesPerField.getFirstError("username", "password")}
-                        </Text>
-                    </Flex>}
-                <Button type={"submit"} mt={"md"}>
-                    {i18n.msg("doLogIn")}
-                </Button>
-            </form>
-
-            <Flex justify={"center"} gap={"xs"} mt={"md"}>
-                <Text>
-                    {i18n.msg("noAccount")}
-                </Text>
-                <Anchor href={props.context.url.registrationUrl}>
-                    {i18n.msg("doRegister")}
-                </Anchor>
-            </Flex>
-
-        </Paper>
-
-    </Flex>
-
-
+    return isMobile ? <MobileLogin
+            loading={loading}
+            setLoading={setLoading}
+            form={form}
+            context={context}/>
+        : <DesktopLogin
+            loading={loading}
+            setLoading={setLoading}
+            form={form}
+            context={context}/>
 }
