@@ -1,6 +1,5 @@
-import type {Meta, StoryObj} from "@storybook/react";
-import {createKcPageStory} from "../KcPageStory";
-import {Organization, organizations} from "../../api/organizations.ts";
+import type { Meta, StoryObj } from "@storybook/react";
+import { createKcPageStory } from "../KcPageStory";
 
 const {KcPageStory} = createKcPageStory({pageId: "login.ftl"});
 
@@ -18,36 +17,14 @@ export const Default: Story = {
 };
 
 
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 export const WithOrganization: Story = {
     render: () => {
 
-
-        // Overwrite API call to return a mock organization
-        organizations.api = {
-            getOrganization: async (organizationId: string) => {
-                console.log("fetching organization from client attribute", organizationId)
-                return timeout(3000)
-                    .then(() => ({
-                    id: organizationId,
-                    theme: {
-                        primaryColor: "#22a24b",
-                        defaultMode: "light",
-                        logo: {
-                            default: "https://uker.app.accuras.io/img/uker_logo.png"
-                        }
-                    }
-                } as Organization));
-            }
-        }
-
         return <KcPageStory kcContext={{
             client: {
-                clientId: "uker-links-frontend",
+                clientId: "uker",
                 attributes: {
-                    "organizationId": "a123F4-b5c6-7d8e-9f0g-h1i2j3k4l5m6"
+                    "organizationId": "uker"
                 }
             }
         }

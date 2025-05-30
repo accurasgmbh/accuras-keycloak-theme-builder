@@ -1,22 +1,22 @@
-import {em, Flex, LoadingOverlay, Paper} from "@mantine/core"
-import {LanguageSelector} from "./LanguageSelector.tsx";
-import {useState} from "react";
-import {useForm, UseFormReturnType} from "@mantine/form";
-import {AppTheme} from "../../MantineTheme.ts";
-import {KcContext} from "keycloakify/login/KcContext";
+import { Flex, LoadingOverlay, Paper } from "@mantine/core";
+import { LanguageSelector } from "./LanguageSelector.tsx";
+import { useState } from "react";
+import { useForm, UseFormReturnType } from "@mantine/form";
+import { AppTheme } from "../../MantineTheme.ts";
+import { KcContext } from "keycloakify/login/KcContext";
 
-import 'mapbox-gl/dist/mapbox-gl.css';
-import {Registration} from "./Registration.tsx";
-import {Message} from "./Message.tsx";
-import {RememberMe} from "./RememberMe.tsx";
-import {ForgotPassword} from "./ForgotPassword.tsx";
-import {SignInButton} from "./SignInButton.tsx";
-import {PasswordInput} from "./PasswordInput.tsx";
-import {UsernameInput} from "./UsernameInput.tsx";
-import {Logo} from "./Logo.tsx";
-import {useMediaQuery} from "@mantine/hooks";
-import {Organization} from "../../api/organizations.ts";
-import {useOrganizationContext} from "../../api/OrganizationContextProvider.tsx";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { Registration } from "./Registration.tsx";
+import { Message } from "./Message.tsx";
+import { RememberMe } from "./RememberMe.tsx";
+import { ForgotPassword } from "./ForgotPassword.tsx";
+import { SignInButton } from "./SignInButton.tsx";
+import { PasswordInput } from "./PasswordInput.tsx";
+import { UsernameInput } from "./UsernameInput.tsx";
+import { Logo } from "./Logo.tsx";
+import { useOrganizationContext } from "../../api/OrganizationContextProvider.tsx";
+import { useIsMobile } from "../../utils/useMobile.tsx";
+import { Organization } from "@accurasgmbh/client";
 
 export interface OrganizationLoginContext extends KcContext.Login {
     organization: Organization | null
@@ -30,13 +30,14 @@ export const MobileLogin = (props: {
 }) => {
 
 
-    return <Flex direction={"column"}
+    return <Paper shadow={"xl"}>
+        <Flex direction={"column"}
                  p={"sm"}
                  style={{
                      backgroundColor: "white",
                      borderBottom: "1x solid rgba(0,0,0,0.1)"
                  }}
-                 pb={2 * Number.parseFloat(AppTheme.spacing!.xl!)}
+                 pb={2 * Number.parseFloat(AppTheme.spacing!.lg!)}
                  align={"stretch"}>
 
 
@@ -47,7 +48,10 @@ export const MobileLogin = (props: {
         <Flex justify={"center"}>
             <Logo/>
         </Flex>
-        <Flex p={"lg"} justify={"center"} direction={"column"}>
+        <Flex p={"lg"}
+              mt={"lg"}
+              justify={"center"}
+              direction={"column"}>
             <form
                 method={"post"}
                 action={props.context.url.loginAction}
@@ -82,6 +86,8 @@ export const MobileLogin = (props: {
 
     </Flex>
 
+</Paper>
+
 }
 
 export const DesktopLogin = (props: {
@@ -99,7 +105,7 @@ export const DesktopLogin = (props: {
                 display: "flex",
                 height: "100vh",
                 width: "100vw",
-                backdropFilter: "blur(5px)"
+               // backdropFilter: "blur(5px)"
             }}>
 
 
@@ -172,7 +178,7 @@ export const Login = () => {
 
     const context = useOrganizationContext();
     const [loading, setLoading] = useState(false);
-    const isMobile = useMediaQuery(`(max-width: ${em(400)})`);
+    const isMobile = useIsMobile()
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {

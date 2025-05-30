@@ -7,7 +7,7 @@ export const SignInButton = (props: {
     context: KcContext.Login
 }) => {
     const {i18n} = useI18n({kcContext: props.context})
-    return<Button type={"submit"} mt={"md"}>
+    return<Button type={"submit"} mt={"md"} color={"accuras"}>
         {i18n.msg("doLogIn")}
     </Button>
 }

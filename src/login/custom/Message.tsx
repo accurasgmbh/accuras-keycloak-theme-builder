@@ -1,9 +1,7 @@
 import {KcContext} from "keycloakify/login/KcContext";
 import {Flex, Text} from "@mantine/core";
 
-
 export const Message = (props : {context: KcContext.Login}) => {
-
 
     return <>
 
@@ -14,6 +12,6 @@ export const Message = (props : {context: KcContext.Login}) => {
                     {props.context.messagesPerField.getFirstError("username", "password")}
                 </Text>
             </Flex>}
-
     </>
+
 }
