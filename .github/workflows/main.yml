@@ -20,12 +20,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          always-auth: true
+          registry-url: https://npm.pkg.github.com/
+          scope: '@accurasgmbh'
 
       - name: Install pnpm
         run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build Keycloak Theme
         run: pnpm run build-keycloak-theme
